@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>确认访问网页</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      text-align: center;
+    }
+    .url-display {
+      word-break: break-all;
+      padding: 10px;
+      margin: 20px 0;
+      background: #f5f5f5;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .confirm-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .visit-btn {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>请确认是否访问以下网址</h1>
+  <div class="url-display" id="targetUrl"></div>
+  <div>
+    <button class="confirm-btn" id="confirmBtn">确认 (<span id="confirmCount">0</span>/3)</button>
+    <button class="visit-btn" id="visitBtn">访问网页</button>
+  </div>
+  <script src="confirm.js"></script>
+</body>
+</html> 

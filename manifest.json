@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "CarefulOpenLink",
+  "version": "1.0",
+  "description": "让用户在打开链接时更加谨慎，需要多次确认才能访问网页",
+  "permissions": [
+    "webNavigation",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {}
+} 
