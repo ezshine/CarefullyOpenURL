@@ -13,6 +13,27 @@ function extractMainDomain(hostname) {
     return parts.slice(-2).join('.');
 }
 
+// 语音播报函数
+function speakDomain(domain) {
+    // 检查浏览器是否支持语音合成
+    if ('speechSynthesis' in window) {
+        // 创建语音合成实例
+        const utterance = new SpeechSynthesisUtterance();
+        
+        // 设置语音内容
+        utterance.text = `${domain}`;
+        
+        // 设置语音属性
+        utterance.lang = 'en-US'; // 中文
+        utterance.rate = 0.5; // 语速稍慢
+        utterance.pitch = 1; // 音高
+        utterance.volume = 1; // 音量
+
+        // 播放语音
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
 // 添加域名高亮的函数
 function highlightDomain(url) {
     try {
@@ -23,8 +44,8 @@ function highlightDomain(url) {
         // 构建正则表达式以精确匹配主域名
         const regex = new RegExp(`(${mainDomain.replace('.', '\\.')})`, 'g');
         
-        // 替换URL中的主域名为高亮版本
-        return url.replace(regex, '<span class="domain">$1</span>');
+        // 替换URL中的主域名为高亮版本，添加data-domain属性以便绑定点击事件
+        return url.replace(regex, `<span class="domain" data-domain="$1">$1</span>`);
     } catch (e) {
         return url; // 如果URL解析失败，返回原始URL
     }
@@ -36,6 +57,20 @@ const targetUrl = urlParams.get('url');
 
 // 显示目标网址（使用高亮函数）
 document.getElementById('targetUrl').innerHTML = highlightDomain(decodeURIComponent(targetUrl));
+
+// 为域名添加点击事件
+document.querySelectorAll('.domain').forEach(domainElement => {
+    domainElement.addEventListener('click', () => {
+        const domain = domainElement.getAttribute('data-domain');
+        speakDomain(domain);
+        
+        // 添加点击动画效果
+        domainElement.style.transform = 'scale(1.05)';
+        setTimeout(() => {
+            domainElement.style.transform = 'scale(1)';
+        }, 200);
+    });
+});
 
 let confirmCount = 0;
 let requiredClicks = 3; // 默认值
