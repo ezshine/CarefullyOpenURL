@@ -10,7 +10,20 @@ const messages = {
         'visitButton': '访问网页',
         'settingsTitle': '设置',
         'saveButton': '保存',
-        'savedStatus': '已保存'
+        'savedStatus': '已保存',
+        'clickCountLabel': '确认次数',
+        'whitelistButton': '白名单列表',
+        'whitelistModalTitle': '白名单列表',
+        'importButton': '导入',
+        'exportButton': '导出',
+        'noWhitelistData': '暂无白名单数据',
+        'loadWhitelistFailed': '加载白名单失败',
+        'addToWhitelist': '将域名加入白名单',
+        'alreadyInWhitelist': '域名已在白名单中',
+        'exportFailed': '导出白名单失败',
+        'importFailed': '导入白名单失败',
+        'invalidImportFormat': '无效的导入文件格式',
+        'pageInfo': '第 $1 页，共 $2 页'
     },
     'en': {
         'pageTitle': 'Carefully Open URL',
@@ -22,7 +35,20 @@ const messages = {
         'visitButton': 'Visit Website',
         'settingsTitle': 'Settings',
         'saveButton': 'Save',
-        'savedStatus': 'Saved'
+        'savedStatus': 'Saved',
+        'clickCountLabel': 'Click Count',
+        'whitelistButton': 'Whitelist',
+        'whitelistModalTitle': 'Whitelist',
+        'importButton': 'Import',
+        'exportButton': 'Export',
+        'noWhitelistData': 'No whitelist data',
+        'loadWhitelistFailed': 'Failed to load whitelist',
+        'addToWhitelist': 'Add to Whitelist',
+        'alreadyInWhitelist': 'Domain already in whitelist',
+        'exportFailed': 'Failed to export whitelist',
+        'importFailed': 'Failed to import whitelist',
+        'invalidImportFormat': 'Invalid import file format',
+        'pageInfo': 'Page $1 of $2'
     }
 };
 
@@ -91,6 +117,57 @@ function updateAllText() {
     
     // 更新确认按钮文本
     updateConfirmButtonText();
+
+    // 更新确认次数标签
+    const clickCountLabel = document.querySelector('.settings-item span');
+    if (clickCountLabel) {
+        clickCountLabel.textContent = i18n('clickCountLabel');
+    }
+
+    // 更新白名单按钮文本
+    const whitelistBtn = document.getElementById('whitelistBtn');
+    if (whitelistBtn) {
+        whitelistBtn.innerHTML = `<i class="ri-shield-star-line"></i>${i18n('addToWhitelist')}`;
+    }
+
+    // 更新白名单列表按钮文本
+    const whitelistListBtn = document.getElementById('whitelistListBtn');
+    if (whitelistListBtn) {
+        const badge = whitelistListBtn.querySelector('.badge');
+        whitelistListBtn.innerHTML = `<i class="ri-list-check"></i>${i18n('whitelistButton')}`;
+        if (badge) {
+            whitelistListBtn.appendChild(badge);
+        }
+    }
+
+    // 更新白名单弹层标题
+    const modalTitle = document.querySelector('.modal-header h2');
+    if (modalTitle) {
+        modalTitle.textContent = i18n('whitelistModalTitle');
+    }
+
+    // 更新导入导出按钮文本
+    const importBtn = document.getElementById('importWhitelistBtn');
+    const exportBtn = document.getElementById('exportWhitelistBtn');
+    if (importBtn) {
+        importBtn.innerHTML = `<i class="ri-upload-2-line"></i>${i18n('importButton')}`;
+    }
+    if (exportBtn) {
+        exportBtn.innerHTML = `<i class="ri-download-2-line"></i>${i18n('exportButton')}`;
+    }
+
+    // 更新分页信息
+    const pageInfo = document.querySelector('.page-info');
+    if (pageInfo) {
+        const currentPage = pageInfo.querySelector('#currentPage');
+        const totalPages = pageInfo.querySelector('#totalPages');
+        if (currentPage && totalPages) {
+            pageInfo.innerHTML = i18n('pageInfo', [
+                `<span id="currentPage">${currentPage.textContent}</span>`,
+                `<span id="totalPages">${totalPages.textContent}</span>`
+            ]);
+        }
+    }
 }
 
 // 初始化页面文本
@@ -160,22 +237,37 @@ function highlightDomain(url) {
 const urlParams = new URLSearchParams(window.location.search);
 const targetUrl = urlParams.get('url');
 
-// 显示目标网址（使用高亮函数）
-document.getElementById('targetUrl').innerHTML = highlightDomain(decodeURIComponent(targetUrl));
+// 初始化目标URL显示
+function initializeTargetUrl() {
+    const targetUrl = urlParams.get('url');
+    const targetUrlElement = document.getElementById('targetUrl');
+    const urlSection = document.querySelector('.url-section');
+    const buttonGroup = document.querySelector('.button-group');
 
-// 为域名添加点击事件
-document.querySelectorAll('.domain').forEach(domainElement => {
-    domainElement.addEventListener('click', () => {
-        const domain = domainElement.getAttribute('data-domain');
-        speakDomain(domain);
+    if (targetUrl && targetUrlElement) {
+        // 有URL参数时显示URL相关内容
+        urlSection.style.display = 'block';
+        buttonGroup.style.display = 'flex';
+        targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
         
-        // 添加点击动画效果
-        domainElement.style.transform = 'scale(1.05)';
-        setTimeout(() => {
-            domainElement.style.transform = 'scale(1)';
-        }, 200);
-    });
-});
+        // 为域名添加点击事件
+        document.querySelectorAll('.domain').forEach(domainElement => {
+            domainElement.addEventListener('click', () => {
+                const domain = domainElement.getAttribute('data-domain');
+                speakDomain(domain);
+                
+                // 添加点击动画效果
+                domainElement.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    domainElement.style.transform = 'scale(1)';
+                }, 200);
+            });
+        });
+    } else {
+        // 没有URL参数时显示欢迎信息
+        document.querySelector('.container').style.display = 'none';
+    }
+}
 
 let confirmCount = 0;
 let requiredClicks = 3; // 默认值
@@ -405,7 +497,7 @@ async function updateWhitelistItems() {
             whitelistItems.innerHTML = '';
 
             if (domains.length === 0) {
-                whitelistItems.innerHTML = '<div class="whitelist-item">暂无白名单数据</div>';
+                whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('noWhitelistData')}</div>`;
                 return;
             }
 
@@ -435,11 +527,11 @@ async function updateWhitelistItems() {
 
         request.onerror = () => {
             console.error('获取白名单列表失败:', request.error);
-            whitelistItems.innerHTML = '<div class="whitelist-item">加载白名单失败</div>';
+            whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
         };
     } catch (error) {
         console.error('访问数据库失败:', error);
-        whitelistItems.innerHTML = '<div class="whitelist-item">加载白名单失败</div>';
+        whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
     }
 }
 
@@ -609,25 +701,5 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeWhitelist();
     
     // 初始化目标URL显示
-    const targetUrl = urlParams.get('url');
-    if (targetUrl) {
-        const targetUrlElement = document.getElementById('targetUrl');
-        if (targetUrlElement) {
-            targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
-            
-            // 为域名添加点击事件
-            document.querySelectorAll('.domain').forEach(domainElement => {
-                domainElement.addEventListener('click', () => {
-                    const domain = domainElement.getAttribute('data-domain');
-                    speakDomain(domain);
-                    
-                    // 添加点击动画效果
-                    domainElement.style.transform = 'scale(1.05)';
-                    setTimeout(() => {
-                        domainElement.style.transform = 'scale(1)';
-                    }, 200);
-                });
-            });
-        }
-    }
+    initializeTargetUrl();
 }); 
