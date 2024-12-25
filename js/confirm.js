@@ -310,6 +310,9 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
                 whitelistBtn.innerHTML = '<i class="ri-check-line"></i>已加入白名单';
                 whitelistBtn.style.color = 'var(--success-color)';
                 
+                // 更新白名单数量
+                updateWhitelistCount();
+                
                 // 3秒后恢复按钮状态
                 setTimeout(() => {
                     whitelistBtn.innerHTML = '<i class="ri-shield-star-line"></i>将域名加入白名单';
