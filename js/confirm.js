@@ -124,7 +124,10 @@ function extractMainDomain(hostname) {
 function speakDomain(domain) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance();
-        utterance.text = domain;
+        // 将域名拆分为单个字符并用逗号连接，保持 .com 等后缀完整
+        const parts = domain.split('.');
+        const prefix = parts[0].split('').join(',');
+        utterance.text = prefix + ',.' + parts[1];
         
         // 根据当前语言设置语音
         utterance.lang = 'en-US';
@@ -462,6 +465,84 @@ async function removeFromWhitelist(domain) {
     }
 }
 
+// 导出白名单
+async function exportWhitelist() {
+    try {
+        const db = await openDatabase();
+        const transaction = db.transaction(['domains'], 'readonly');
+        const store = transaction.objectStore('domains');
+        const domains = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        // 创建导出数据
+        const exportData = {
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            domains: domains
+        };
+
+        // 创建并下载文件
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `whitelist-${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error('导出白名单失败:', error);
+    }
+}
+
+// 导入白名单
+async function importWhitelist(file) {
+    try {
+        const content = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (e) => resolve(e.target.result);
+            reader.onerror = () => reject(reader.error);
+            reader.readAsText(file);
+        });
+
+        const importData = JSON.parse(content);
+        
+        // 验证导入数据格式
+        if (!importData.domains || !Array.isArray(importData.domains)) {
+            throw new Error('无效的导入文件格式');
+        }
+
+        const db = await openDatabase();
+        const transaction = db.transaction(['domains'], 'readwrite');
+        const store = transaction.objectStore('domains');
+
+        // 导入所有域名
+        for (const item of importData.domains) {
+            if (item.domain && typeof item.domain === 'string') {
+                try {
+                    await new Promise((resolve, reject) => {
+                        const request = store.put(item);
+                        request.onsuccess = () => resolve();
+                        request.onerror = () => reject(request.error);
+                    });
+                } catch (error) {
+                    console.warn(`导入域名 ${item.domain} 失败:`, error);
+                }
+            }
+        }
+
+        // 更新界面
+        updateWhitelistItems();
+        updateWhitelistCount();
+    } catch (error) {
+        console.error('导入白名单失败:', error);
+    }
+}
+
 // 初始化白名单功能
 function initializeWhitelist() {
     updateWhitelistCount();
@@ -478,6 +559,31 @@ function initializeWhitelist() {
             hideWhitelistModal();
         }
     });
+
+    // 绑定导入导出按钮事件
+    const importBtn = document.getElementById('importWhitelistBtn');
+    const exportBtn = document.getElementById('exportWhitelistBtn');
+    const fileInput = document.getElementById('whitelistFileInput');
+
+    if (importBtn && exportBtn && fileInput) {
+        // 导入按钮点击事件
+        importBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择事件
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                importWhitelist(file);
+                // 清除文件选择，以便可以重复导入同一个文件
+                fileInput.value = '';
+            }
+        });
+
+        // 导出按钮点击事件
+        exportBtn.addEventListener('click', exportWhitelist);
+    }
 }
 
 // 显示白名单列表
