@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "Careful Open URL",
+    "description": "The name of the extension"
+  },
+  "extensionDescription": {
+    "message": "A security tool to help users verify URLs before visiting them",
+    "description": "The description of the extension"
+  }
+} 

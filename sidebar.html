@@ -2,47 +2,37 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>确认访问设置</title>
-    <style>
-        body {
-            width: 300px;
-            padding: 16px;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
-        .setting-item {
-            margin-bottom: 16px;
-        }
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-        input[type="number"] {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            width: 100%;
-            padding: 8px;
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #1557b0;
-        }
-    </style>
+    <title>域名白名单</title>
+    <link rel="stylesheet" href="css/sidebar.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 <body>
-    <div class="setting-item">
-        <label for="clickCount">确认按钮点击次数</label>
-        <input type="number" id="clickCount" min="0" value="3">
+    <div class="container">
+        <h1>
+            <i class="ri-shield-star-line"></i>
+            域名白名单
+        </h1>
+
+        <div class="domain-list" id="domainList">
+            <!-- 域名列表将由 JavaScript 动态生成 -->
+        </div>
+
+        <div class="pagination" id="pagination">
+            <!-- 分页按钮将由 JavaScript 动态生成 -->
+        </div>
+
+        <div class="actions">
+            <button class="action-btn" id="importBtn">
+                <i class="ri-download-line"></i>
+                导入
+            </button>
+            <button class="action-btn" id="exportBtn">
+                <i class="ri-upload-line"></i>
+                导出
+            </button>
+        </div>
     </div>
-    <button id="saveSettings">保存设置</button>
-    <script src="sidebar.js"></script>
+
+    <script src="js/sidebar.js"></script>
 </body>
 </html> 

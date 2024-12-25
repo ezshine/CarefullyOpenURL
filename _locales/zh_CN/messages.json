@@ -1,0 +1,10 @@
+{
+  "extensionName": {
+    "message": "小心打开网址",
+    "description": "扩展名称"
+  },
+  "extensionDescription": {
+    "message": "一个帮助用户在访问链接前验证URL的安全工具",
+    "description": "扩展描述"
+  }
+} 
