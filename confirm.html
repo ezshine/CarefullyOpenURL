@@ -4,47 +4,189 @@
   <meta charset="UTF-8">
   <title>确认访问网页</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-      text-align: center;
+    :root {
+      --primary-color: #3b82f6;
+      --success-color: #22c55e;
+      --background-color: #f8fafc;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+      --warning-color: #f59e0b;
+      --domain-background: #fef3c7;
     }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 40px 20px;
+      background-color: var(--background-color);
+      color: var(--text-color);
+      line-height: 1.5;
+    }
+
+    .container {
+      background: white;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin-bottom: 24px;
+      color: var(--text-color);
+    }
+
+    .url-section {
+      margin: 24px 0;
+      text-align: left;
+    }
+
+    .url-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--warning-color);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .url-label i {
+      font-size: 20px;
+    }
+
     .url-display {
       word-break: break-all;
-      padding: 10px;
-      margin: 20px 0;
-      background: #f5f5f5;
-      border: 1px solid #ddd;
-      border-radius: 4px;
+      padding: 20px;
+      margin: 12px 0;
+      background: white;
+      border: 2px solid var(--warning-color);
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 16px;
+      line-height: 1.6;
+      position: relative;
     }
+
+    .url-display .domain {
+      background: var(--domain-background);
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+      color: var(--warning-color);
+    }
+
+    .security-tip {
+      font-size: 13px;
+      color: var(--warning-color);
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .security-tip i {
+      font-size: 16px;
+    }
+
+    .progress-text {
+      font-size: 14px;
+      color: #64748b;
+      margin: 16px 0;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
     .confirm-btn {
-      padding: 10px 20px;
-      margin: 10px;
+      padding: 12px 24px;
       font-size: 16px;
-      cursor: pointer;
-    }
-    .visit-btn {
-      padding: 10px 20px;
-      margin: 10px;
-      font-size: 16px;
-      background-color: #4CAF50;
+      font-weight: 500;
       color: white;
+      background-color: var(--primary-color);
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .confirm-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.2);
+    }
+
+    .visit-btn {
+      padding: 12px 24px;
+      font-size: 16px;
+      font-weight: 500;
+      color: white;
+      background-color: var(--success-color);
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: none;
     }
+
+    .visit-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 6px -1px rgba(34, 197, 94, 0.2);
+    }
+
+    .required-clicks {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 24px;
+      height: 24px;
+      padding: 0 8px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+    }
   </style>
+  <link
+    href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css"
+    rel="stylesheet"
+  />
 </head>
 <body>
-  <h1>请确认是否访问以下网址</h1>
-  <div class="url-display" id="targetUrl"></div>
-  <div>
-    <button class="confirm-btn" id="confirmBtn">确认 (<span id="confirmCount">0</span>/3)</button>
-    <button class="visit-btn" id="visitBtn">访问网页</button>
+  <div class="container">
+    <h1>请确认是否访问以下网址</h1>
+    
+    <div class="url-section">
+      <div class="url-label">
+        <i class="ri-shield-check-line"></i>
+        <span>请仔细检查以下网址，特别是高亮的域名部分：</span>
+      </div>
+      <div class="url-display" id="targetUrl"></div>
+      <div class="security-tip">
+        <i class="ri-information-line"></i>
+        <span>提示：请注意甄别域名，防止访问钓鱼网站</span>
+      </div>
+    </div>
+
+    <div class="progress-text">
+      需要点击确认按钮 <span class="required-clicks requiredClicks">3</span> 次才能访问此网页
+    </div>
+
+    <div class="button-group">
+      <button class="confirm-btn" id="confirmBtn">
+        确认 (<span id="confirmCount">0</span>/<span class="requiredClicks">3</span>)
+      </button>
+      <button class="visit-btn" id="visitBtn">
+        <i class="ri-external-link-line"></i> 访问网页
+      </button>
+    </div>
   </div>
+
   <script src="confirm.js"></script>
 </body>
 </html> 

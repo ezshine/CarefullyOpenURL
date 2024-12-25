@@ -5,7 +5,9 @@
   "description": "让用户在打开链接时更加谨慎，需要多次确认才能访问网页",
   "permissions": [
     "webNavigation",
-    "tabs"
+    "tabs",
+    "storage",
+    "sidePanel"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -13,5 +15,10 @@
   "background": {
     "service_worker": "background.js"
   },
-  "action": {}
+  "action": {
+    "default_title": "确认访问设置"
+  },
+  "side_panel": {
+    "default_path": "sidebar.html"
+  }
 } 
