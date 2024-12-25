@@ -23,7 +23,9 @@ const messages = {
         'exportFailed': '导出白名单失败',
         'importFailed': '导入白名单失败',
         'invalidImportFormat': '无效的导入文件格式',
-        'pageInfo': '第 $1 页，共 $2 页'
+        'pageInfo': '第 $1 页，共 $2 页',
+        'addedToWhitelist': '已加入白名单',
+        'domainInWhitelist': '域名已在白名单中'
     },
     'en': {
         'pageTitle': 'Carefully Open URL',
@@ -36,7 +38,7 @@ const messages = {
         'settingsTitle': 'Settings',
         'saveButton': 'Save',
         'savedStatus': 'Saved',
-        'clickCountLabel': 'Click Count',
+        'clickCountLabel': 'Confirm Count',
         'whitelistButton': 'Whitelist',
         'whitelistModalTitle': 'Whitelist',
         'importButton': 'Import',
@@ -48,7 +50,9 @@ const messages = {
         'exportFailed': 'Failed to export whitelist',
         'importFailed': 'Failed to import whitelist',
         'invalidImportFormat': 'Invalid import file format',
-        'pageInfo': 'Page $1 of $2'
+        'pageInfo': 'Page $1 of $2',
+        'addedToWhitelist': 'Added to whitelist',
+        'domainInWhitelist': 'Domain already in whitelist'
     }
 };
 
@@ -97,7 +101,7 @@ function updateLanguageButton() {
     currentLangSpan.textContent = currentLang === 'zh-CN' ? '中文' : 'English';
 }
 
-// 更新所有文本的函数
+// 更新所有文本的函��
 function updateAllText() {
     // 更新所有带有 data-i18n 属性的元素
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -238,7 +242,7 @@ const urlParams = new URLSearchParams(window.location.search);
 const targetUrl = urlParams.get('url');
 
 // 初始化目标URL显示
-function initializeTargetUrl() {
+async function initializeTargetUrl() {
     const targetUrl = urlParams.get('url');
     const targetUrlElement = document.getElementById('targetUrl');
     const urlSection = document.querySelector('.url-section');
@@ -249,6 +253,30 @@ function initializeTargetUrl() {
         urlSection.style.display = 'block';
         buttonGroup.style.display = 'flex';
         targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
+        
+        // 检查域名是否在白名单中
+        try {
+            const urlObj = new URL(decodeURIComponent(targetUrl));
+            const domain = extractMainDomain(urlObj.hostname);
+            const db = await openDatabase();
+            const transaction = db.transaction(['domains'], 'readonly');
+            const store = transaction.objectStore('domains');
+            
+            const getRequest = store.get(domain);
+            getRequest.onsuccess = () => {
+                if (getRequest.result) {
+                    // 如果域名在白名单中，直接设置确认次数为所需次数
+                    confirmCount = requiredClicks;
+                    updateConfirmButtonText();
+
+                    const whitelistBtn = document.getElementById('whitelistBtn');
+                    whitelistBtn.innerHTML = `<i class="ri-information-line"></i>${i18n('domainInWhitelist')}`;
+                    whitelistBtn.style.color = 'var(--warning-color)';
+                }
+            };
+        } catch (error) {
+            console.error('检查白名单失败:', error);
+        }
         
         // 为域名添加点击事件
         document.querySelectorAll('.domain').forEach(domainElement => {
@@ -294,6 +322,14 @@ function updateConfirmButtonText() {
     if (confirmBtn) {
         confirmBtn.textContent = i18n('confirmButton', [confirmCount.toString(), requiredClicks.toString()]);
     }
+
+    if (confirmCount >= requiredClicks) {
+        confirmBtn.style.display = 'none';
+        visitBtn.style.display = 'inline-block';
+    } else {
+        confirmBtn.style.display = 'inline-block';
+        visitBtn.style.display = 'none';
+    }
 }
 
 // 处理确认按钮点击
@@ -327,8 +363,8 @@ function initializeSettings() {
     
     // 从存储中获取设置
     chrome.storage.local.get('requiredClicks', (result) => {
-        if (result.requiredClicks) {
-            clickNumber.value = result.requiredClicks;
+        // if (result.requiredClicks) {
+            clickNumber.value = result.requiredClicks||0;
             requiredClicks = result.requiredClicks;
             
             // 更新所有显示点击次数的元素
@@ -336,9 +372,9 @@ function initializeSettings() {
                 span.textContent = result.requiredClicks;
             });
             
-            // 更新确认按钮文本
+            // 更新确认��钮文本
             updateConfirmButtonText();
-        }
+        // }
     });
     
     // 添加输入事件监听，实时更新
@@ -367,13 +403,7 @@ function initializeSettings() {
         chrome.storage.local.set({ requiredClicks: value });
         
         // 如果当前点击次数已经达到新的要求
-        if (confirmCount >= value) {
-            confirmBtn.style.display = 'none';
-            visitBtn.style.display = 'inline-block';
-        } else {
-            confirmBtn.style.display = 'inline-block';
-            visitBtn.style.display = 'none';
-        }
+        
     });
 }
 
@@ -393,7 +423,7 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
             const transaction = db.transaction(['domains'], 'readwrite');
             const store = transaction.objectStore('domains');
             
-            // 添加域名到白名单
+            // 添加域��到白名单
             const addRequest = store.add({
                 domain,
                 dateAdded: new Date().toISOString()
@@ -402,29 +432,24 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
             addRequest.onsuccess = () => {
                 // 更新按钮状态
                 const whitelistBtn = document.getElementById('whitelistBtn');
-                whitelistBtn.innerHTML = '<i class="ri-check-line"></i>已加入白名单';
+                whitelistBtn.innerHTML = `<i class="ri-check-line"></i>${i18n('addedToWhitelist')}`;
                 whitelistBtn.style.color = 'var(--success-color)';
                 
                 // 更新白名单数量
                 updateWhitelistCount();
-                
-                // 3秒后恢复按钮状态
-                setTimeout(() => {
-                    whitelistBtn.innerHTML = '<i class="ri-shield-star-line"></i>将域名加入白名单';
-                    whitelistBtn.style.color = '';
-                }, 3000);
+
+                confirmCount = requiredClicks;
+                updateConfirmButtonText();
             };
             
             addRequest.onerror = () => {
                 if (addRequest.error.name === 'ConstraintError') {
                     // 域名已存在
-                    whitelistBtn.innerHTML = '<i class="ri-information-line"></i>域名已在白名单中';
+                    whitelistBtn.innerHTML = `<i class="ri-information-line"></i>${i18n('domainInWhitelist')}`;
                     whitelistBtn.style.color = 'var(--warning-color)';
-                    
-                    setTimeout(() => {
-                        whitelistBtn.innerHTML = '<i class="ri-shield-star-line"></i>将域名加入白名单';
-                        whitelistBtn.style.color = '';
-                    }, 3000);
+
+                    confirmCount = requiredClicks;
+                    updateConfirmButtonText();
                 }
             };
         };
@@ -447,6 +472,11 @@ const whitelistModal = document.getElementById('whitelistModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const whitelistItems = document.getElementById('whitelistItems');
 const whitelistCount = document.getElementById('whitelistCount');
+
+// 分页相关变量
+const PAGE_SIZE = 10; // 每页显示的数量
+let currentPage = 1;
+let totalPages = 1;
 
 // 更新白名单数量徽章
 async function updateWhitelistCount() {
@@ -498,13 +528,21 @@ async function updateWhitelistItems() {
 
             if (domains.length === 0) {
                 whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('noWhitelistData')}</div>`;
+                updatePagination(0);
                 return;
             }
 
             // 按日期降序排序
             domains.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
 
-            domains.forEach(item => {
+            // 计算分页
+            totalPages = Math.ceil(domains.length / PAGE_SIZE);
+            const start = (currentPage - 1) * PAGE_SIZE;
+            const end = Math.min(start + PAGE_SIZE, domains.length);
+            const pageItems = domains.slice(start, end);
+
+            // 显示当前页的数据
+            pageItems.forEach(item => {
                 const domainElement = document.createElement('div');
                 domainElement.className = 'whitelist-item';
                 domainElement.innerHTML = `
@@ -523,15 +561,47 @@ async function updateWhitelistItems() {
                     removeFromWhitelist(domain);
                 });
             });
+
+            // 更新分页控件
+            updatePagination(domains.length);
         };
 
         request.onerror = () => {
             console.error('获取白名单列表失败:', request.error);
             whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
+            updatePagination(0);
         };
     } catch (error) {
         console.error('访问数据库失败:', error);
         whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
+        updatePagination(0);
+    }
+}
+
+// 更新分页控件
+function updatePagination(totalItems) {
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+    const currentPageSpan = document.getElementById('currentPage');
+    const totalPagesSpan = document.getElementById('totalPages');
+
+    totalPages = Math.ceil(totalItems / PAGE_SIZE);
+    
+    // 更新页码显示
+    currentPageSpan.textContent = currentPage;
+    totalPagesSpan.textContent = totalPages;
+
+    // 更新按钮状态
+    prevPageBtn.disabled = currentPage <= 1;
+    nextPageBtn.disabled = currentPage >= totalPages;
+
+    // 更新分页信息文本
+    const pageInfo = document.querySelector('.page-info');
+    if (pageInfo) {
+        pageInfo.innerHTML = i18n('pageInfo', [
+            `<span id="currentPage">${currentPage}</span>`,
+            `<span id="totalPages">${totalPages}</span>`
+        ]);
     }
 }
 
@@ -676,11 +746,30 @@ function initializeWhitelist() {
         // 导出按钮点击事件
         exportBtn.addEventListener('click', exportWhitelist);
     }
+
+    // 绑定分页按钮事件
+    const prevPageBtn = document.getElementById('prevPage');
+    const nextPageBtn = document.getElementById('nextPage');
+
+    prevPageBtn.addEventListener('click', () => {
+        if (currentPage > 1) {
+            currentPage--;
+            updateWhitelistItems();
+        }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+        if (currentPage < totalPages) {
+            currentPage++;
+            updateWhitelistItems();
+        }
+    });
 }
 
 // 显示白名单列表
 function showWhitelistModal() {
     whitelistModal.classList.add('show');
+    currentPage = 1; // 重置页码
     updateWhitelistItems();
 }
 
