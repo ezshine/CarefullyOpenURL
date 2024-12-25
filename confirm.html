@@ -43,10 +43,32 @@
       <span>确认次数</span>
       <input type="number" class="click-number" id="clickNumber" min="0" max="9" value="3">
     </div>
+    <button class="settings-item whitelist-list-btn" id="whitelistListBtn">
+      <i class="ri-list-check"></i>
+      白名单列表
+      <span class="badge" id="whitelistCount">0</span>
+    </button>
     <button class="settings-item lang-switch" id="langSwitch">
       <i class="ri-translate"></i>
       <span class="current-lang">中文</span>
     </button>
+  </div>
+
+  <!-- 白名单列表弹层 -->
+  <div class="modal" id="whitelistModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>白名单列表</h2>
+        <button class="close-btn" id="closeModalBtn">
+          <i class="ri-close-line"></i>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="whitelist-items" id="whitelistItems">
+          <!-- 白名单列表项将通过 JavaScript 动态添加 -->
+        </div>
+      </div>
+    </div>
   </div>
 
   <script src="js/confirm.js"></script>

@@ -7,8 +7,7 @@
   "permissions": [
     "webNavigation",
     "tabs",
-    "storage",
-    "sidePanel"
+    "storage"
   ],
   "host_permissions": [
     "<all_urls>"
@@ -18,8 +17,5 @@
   },
   "action": {
     "default_title": "确认访问设置"
-  },
-  "side_panel": {
-    "default_path": "sidebar.html"
   }
 } 
