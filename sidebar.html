@@ -8,28 +8,31 @@
 </head>
 <body>
     <div class="container">
-        <h1>
-            <i class="ri-shield-star-line"></i>
-            域名白名单
-        </h1>
-
-        <div class="domain-list" id="domainList">
-            <!-- 域名列表将由 JavaScript 动态生成 -->
+        <div class="header">
+            <h1 class="title">
+                <i class="ri-shield-star-line"></i>
+                域名白名单
+            </h1>
+            <div class="actions">
+                <button class="action-btn" id="importBtn">
+                    <i class="ri-download-line"></i>
+                    导入
+                </button>
+                <button class="action-btn" id="exportBtn">
+                    <i class="ri-upload-line"></i>
+                    导出
+                </button>
+            </div>
         </div>
 
-        <div class="pagination" id="pagination">
-            <!-- 分页按钮将由 JavaScript 动态生成 -->
-        </div>
+        <div class="content">
+            <div class="domain-list" id="domainList">
+                <!-- 域名列表将由 JavaScript 动态生成 -->
+            </div>
 
-        <div class="actions">
-            <button class="action-btn" id="importBtn">
-                <i class="ri-download-line"></i>
-                导入
-            </button>
-            <button class="action-btn" id="exportBtn">
-                <i class="ri-upload-line"></i>
-                导出
-            </button>
+            <div class="pagination" id="pagination">
+                <!-- 分页按钮将由 JavaScript 动态生成 -->
+            </div>
         </div>
     </div>
 

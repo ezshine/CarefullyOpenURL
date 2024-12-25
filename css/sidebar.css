@@ -6,36 +6,91 @@
     --border-color: #e2e8f0;
 }
 
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    margin: 0;
-    padding: 20px;
     background-color: var(--background-color);
     color: var(--text-color);
 }
 
 .container {
-    max-width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
-h1 {
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.title {
     font-size: 18px;
     font-weight: 600;
-    margin-bottom: 20px;
     display: flex;
     align-items: center;
     gap: 8px;
+    margin: 0;
 }
 
-h1 i {
+.title i {
     color: var(--primary-color);
 }
 
+.actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--border-color);
+    background: white;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-color);
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+}
+
+.action-btn i {
+    font-size: 16px;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .domain-list {
+    flex: 1;
     background: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
+    overflow-y: auto;
+    margin-bottom: 20px;
 }
 
 .domain-item {
@@ -72,7 +127,7 @@ h1 i {
     display: flex;
     justify-content: center;
     gap: 4px;
-    margin: 20px 0;
+    flex-shrink: 0;
 }
 
 .page-btn {
@@ -99,37 +154,6 @@ h1 i {
     background: var(--primary-color);
     color: white;
     border-color: var(--primary-color);
-}
-
-.actions {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-}
-
-.action-btn {
-    flex: 1;
-    height: 36px;
-    border: 1px solid var(--border-color);
-    background: white;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    color: var(--text-color);
-    transition: all 0.2s;
-}
-
-.action-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-.action-btn i {
-    font-size: 16px;
 }
 
 .empty-state {
