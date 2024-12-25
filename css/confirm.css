@@ -280,6 +280,15 @@ h1 {
 .lang-switch {
   cursor: pointer;
   transition: all 0.2s ease;
+  width: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.lang-switch .current-lang {
+  text-align: left;
 }
 
 .lang-switch:hover {
