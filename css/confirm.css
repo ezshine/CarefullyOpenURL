@@ -420,4 +420,79 @@ h1 {
 
 .whitelist-item .remove-btn:hover {
   background: #ffebee;
+}
+
+.intro-page {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 24px;
+}
+
+.intro-title {
+    color: var(--text-color);
+    font-size: 32px;
+    font-weight: 700;
+    margin-bottom: 40px;
+    text-align: center;
+    position: relative;
+    padding-bottom: 20px;
+}
+
+.intro-title::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.intro-content {
+    padding: 0 20px;
+}
+
+.intro-point {
+    color: var(--text-color);
+    font-size: 18px;
+    line-height: 1.6;
+    margin-bottom: 24px;
+    padding: 24px 32px;
+    background: var(--background-color);
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.intro-point::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: var(--primary-color);
+    border-radius: 2px;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.intro-point:hover {
+    transform: translateX(10px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+
+/* 添加序号样式 */
+.intro-point span {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-right: 12px;
+    font-size: 20px;
 } 

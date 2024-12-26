@@ -25,7 +25,9 @@ const messages = {
         'invalidImportFormat': '无效的导入文件格式',
         'pageInfo': '第 $1 页，共 $2 页',
         'addedToWhitelist': '已加入白名单',
-        'domainInWhitelist': '域名已在白名单中'
+        'domainInWhitelist': '域名已在白名单中',
+        'introPoint1': '1. 防范钓鱼网站最好的方式就是仔细检查每一个即将要打开的网址。',
+        'introPoint2': '2. 钓鱼网站通常采用近似目标域名的方式来进行迷惑，点击播放域名的读音，将使得这些迷惑的域名无处遁形。'
     },
     'en': {
         'pageTitle': 'Carefully Open URL',
@@ -52,7 +54,9 @@ const messages = {
         'invalidImportFormat': 'Invalid import file format',
         'pageInfo': 'Page $1 of $2',
         'addedToWhitelist': 'Added to whitelist',
-        'domainInWhitelist': 'Domain already in whitelist'
+        'domainInWhitelist': 'Domain already in whitelist',
+        'introPoint1': '1. The best way to prevent phishing is to carefully check every url before opening it.',
+        'introPoint2': '2. Phishing sites often use similar domain names to deceive. Click to play the domain pronunciation to expose these deceptive domains.'
     }
 };
 
@@ -220,7 +224,7 @@ function speakDomain(domain) {
     }
 }
 
-// 添加域名高亮的函数
+// 添加域名高��的函数
 function highlightDomain(url) {
     try {
         const urlObj = new URL(url);
@@ -247,6 +251,7 @@ async function initializeTargetUrl() {
     const targetUrlElement = document.getElementById('targetUrl');
     const urlSection = document.querySelector('.url-section');
     const buttonGroup = document.querySelector('.button-group');
+    const container = document.querySelector('.container');
 
     if (targetUrl && targetUrlElement) {
         // 有URL参数时显示URL相关内容
@@ -254,7 +259,7 @@ async function initializeTargetUrl() {
         buttonGroup.style.display = 'flex';
         targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
         
-        // 检查��名是否在白名单中
+        // 检查域名是否在白名单中
         try {
             const urlObj = new URL(decodeURIComponent(targetUrl));
             const domain = extractMainDomain(urlObj.hostname);
@@ -265,7 +270,6 @@ async function initializeTargetUrl() {
             const getRequest = store.get(domain);
             getRequest.onsuccess = () => {
                 if (getRequest.result) {
-                    // 如果域名在白名单中，直接设置确认次数为所需次数
                     confirmCount = requiredClicks;
                     updateConfirmButtonText();
 
@@ -292,8 +296,23 @@ async function initializeTargetUrl() {
             });
         });
     } else {
-        // 没有URL参数时显示欢迎信息
-        document.querySelector('.container').style.display = 'none';
+        // 没有URL参数时显示介绍页
+        container.innerHTML = `
+            <div class="intro-page">
+                <h1 class="intro-title" data-i18n="pageTitle">${i18n('pageTitle')}</h1>
+                <div class="intro-content">
+                    <div class="intro-point" data-i18n="introPoint1">
+                        <span>01</span>
+                        ${i18n('introPoint1')}
+                    </div>
+                    <div class="intro-point" data-i18n="introPoint2">
+                        <span>02</span>
+                        ${i18n('introPoint2')}
+                    </div>
+                </div>
+            </div>
+        `;
+        container.style.display = 'block';
     }
 }
 
@@ -451,7 +470,7 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
                 whitelistBtn.innerHTML = `<i class="ri-check-line"></i>${i18n('addedToWhitelist')}`;
                 whitelistBtn.style.color = 'var(--success-color)';
                 
-                // 更新白名单数量
+                // 更新白��单数量
                 updateWhitelistCount();
 
                 confirmCount = requiredClicks;
