@@ -101,7 +101,7 @@ function updateLanguageButton() {
     currentLangSpan.textContent = currentLang === 'zh-CN' ? '中文' : 'English';
 }
 
-// 更新所有文本的函��
+// 更新所有文本的函数
 function updateAllText() {
     // 更新所有带有 data-i18n 属性的元素
     document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -254,7 +254,7 @@ async function initializeTargetUrl() {
         buttonGroup.style.display = 'flex';
         targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
         
-        // 检查域名是否在白名单中
+        // 检查��名是否在白名单中
         try {
             const urlObj = new URL(decodeURIComponent(targetUrl));
             const domain = extractMainDomain(urlObj.hostname);
@@ -306,24 +306,40 @@ const requiredClicksSpans = document.querySelector('.requiredClicks');
 
 // 获取所需的点击次数
 chrome.runtime.sendMessage({ type: 'getRequiredClicks' }, (response) => {
-    if (response && response.clicks) {
+    if (response && typeof response.clicks === 'number') {
         requiredClicks = response.clicks;
         
         // 更新所有需要显示点击次数的元素
         document.querySelectorAll('.requiredClicks').forEach(span => {
-            span.textContent = requiredClicks;
+            if (span) {
+                span.textContent = requiredClicks.toString();
+            }
         });
+        
+        // 更新确认按钮文本
+        updateConfirmButtonText();
     }
 });
 
 // 更新确认按钮文本的函数
 function updateConfirmButtonText() {
     const confirmBtn = document.getElementById('confirmBtn');
-    if (confirmBtn) {
-        confirmBtn.textContent = i18n('confirmButton', [confirmCount.toString(), requiredClicks.toString()]);
+    const visitBtn = document.getElementById('visitBtn');
+    
+    if (!confirmBtn || !visitBtn) {
+        return; // Exit if buttons don't exist
     }
 
-    if (confirmCount >= requiredClicks) {
+    // Ensure confirmCount and requiredClicks are numbers
+    const currentCount = Number(confirmCount) || 0;
+    const requiredCount = Number(requiredClicks) || 0;
+
+    confirmBtn.textContent = i18n('confirmButton', [
+        currentCount.toString(), 
+        requiredCount.toString()
+    ]);
+
+    if (currentCount >= requiredCount) {
         confirmBtn.style.display = 'none';
         visitBtn.style.display = 'inline-block';
     } else {
@@ -372,7 +388,7 @@ function initializeSettings() {
                 span.textContent = result.requiredClicks;
             });
             
-            // 更新确认��钮文本
+            // 更新确认按钮文本
             updateConfirmButtonText();
         // }
     });
@@ -423,7 +439,7 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
             const transaction = db.transaction(['domains'], 'readwrite');
             const store = transaction.objectStore('domains');
             
-            // 添加域��到白名单
+            // 添加域名到白名单
             const addRequest = store.add({
                 domain,
                 dateAdded: new Date().toISOString()
