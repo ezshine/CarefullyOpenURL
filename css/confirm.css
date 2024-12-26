@@ -488,8 +488,7 @@ h1 {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
-
-/* 添加序号样式 */
+/* Add sequence number style */
 .intro-point span {
     color: var(--primary-color);
     font-weight: 600;

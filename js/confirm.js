@@ -1,4 +1,4 @@
-// 语言包定义
+// Language package definition
 const messages = {
     'zh-CN': {
         'pageTitle': '小心打开网址',
@@ -25,7 +25,7 @@ const messages = {
         'invalidImportFormat': '无效的导入文件格式',
         'pageInfo': '第 $1 页，共 $2 页',
         'addedToWhitelist': '已加入白名单',
-        'domainInWhitelist': '域名已在白名单中',
+        'domainInWhitelist': '域名已��白名单中',
         'introPoint1': '1. 防范钓鱼网站最好的方式就是仔细检查每一个即将要打开的网址。',
         'introPoint2': '2. 钓鱼网站通常采用近似目标域名的方式来进行迷惑，点击播放域名的读音，将使得这些迷惑的域名无处遁形。'
     },
@@ -60,12 +60,12 @@ const messages = {
     }
 };
 
-// 获取当前语言
+// Get current language
 function getCurrentLanguage() {
     return localStorage.getItem('preferredLanguage') || 'zh-CN';
 }
 
-// 获取消息文本
+// Get message text
 function i18n(messageName, substitutions = null) {
     const currentLang = getCurrentLanguage();
     const message = messages[currentLang][messageName];
@@ -81,22 +81,22 @@ function i18n(messageName, substitutions = null) {
     return message;
 }
 
-// 切换语言
+// Switch language
 function switchLanguage() {
     const currentLang = getCurrentLanguage();
     const newLang = currentLang === 'zh-CN' ? 'en' : 'zh-CN';
     
-    // 保存新的语言设置到 localStorage
+    // Save new language setting to localStorage
     localStorage.setItem('preferredLanguage', newLang);
     
-    // 更新页面上的所有文本
+    // Update all text on the page
     updateAllText();
     
-    // 更新语言切换按钮
+    // Update language switch button
     updateLanguageButton();
 }
 
-// 更新语言切换按钮文本
+// Update language switch button text
 function updateLanguageButton() {
     const langSwitch = document.getElementById('langSwitch');
     const currentLangSpan = langSwitch.querySelector('.current-lang');
@@ -105,9 +105,9 @@ function updateLanguageButton() {
     currentLangSpan.textContent = currentLang === 'zh-CN' ? '中文' : 'English';
 }
 
-// 更新所有文本的函数
+// Function to update all text
 function updateAllText() {
-    // 更新所有带有 data-i18n 属性的元素
+    // Update all elements with data-i18n attribute
     document.querySelectorAll('[data-i18n]').forEach(element => {
         const messageName = element.getAttribute('data-i18n');
         const args = element.getAttribute('data-i18n-args');
@@ -120,25 +120,25 @@ function updateAllText() {
         }
     });
 
-    // 更新页面标题
+    // Update page title
     document.title = i18n('pageTitle');
     
-    // 更新确认按钮文本
+    // Update confirm button text
     updateConfirmButtonText();
 
-    // 更新确认次数标签
+    // Update confirm count label
     const clickCountLabel = document.querySelector('.settings-item span');
     if (clickCountLabel) {
         clickCountLabel.textContent = i18n('clickCountLabel');
     }
 
-    // 更新白名单按钮文本
+    // Update whitelist button text
     const whitelistBtn = document.getElementById('whitelistBtn');
     if (whitelistBtn) {
         whitelistBtn.innerHTML = `<i class="ri-shield-star-line"></i>${i18n('addToWhitelist')}`;
     }
 
-    // 更新白名单列表按钮文本
+    // Update whitelist list button text
     const whitelistListBtn = document.getElementById('whitelistListBtn');
     if (whitelistListBtn) {
         const badge = whitelistListBtn.querySelector('.badge');
@@ -148,13 +148,13 @@ function updateAllText() {
         }
     }
 
-    // 更新白名单弹层标题
+    // Update whitelist modal title
     const modalTitle = document.querySelector('.modal-header h2');
     if (modalTitle) {
         modalTitle.textContent = i18n('whitelistModalTitle');
     }
 
-    // 更新导入导出按钮文本
+    // Update import export button text
     const importBtn = document.getElementById('importWhitelistBtn');
     const exportBtn = document.getElementById('exportWhitelistBtn');
     if (importBtn) {
@@ -164,7 +164,7 @@ function updateAllText() {
         exportBtn.innerHTML = `<i class="ri-download-2-line"></i>${i18n('exportButton')}`;
     }
 
-    // 更新分页信息
+    // Update page info
     const pageInfo = document.querySelector('.page-info');
     if (pageInfo) {
         const currentPage = pageInfo.querySelector('#currentPage');
@@ -178,38 +178,38 @@ function updateAllText() {
     }
 }
 
-// 初始化页面文本
+// Initialize page text
 function initializeI18n() {
     updateAllText();
     updateLanguageButton();
     
-    // 添加语言切换按钮事件监听
+    // Add language switch button event listener
     const langSwitch = document.getElementById('langSwitch');
     if (langSwitch) {
         langSwitch.addEventListener('click', switchLanguage);
     }
 }
 
-// 提取主域名的函数
+// Function to extract main domain
 function extractMainDomain(hostname) {
-    // 移除最后的点（如果有）
+    // Remove trailing dot (if exists)
     hostname = hostname.replace(/\.$/, '');
     
-    // 检查是否是 IP 地址
+    // Check if it's an IP address
     const hostWithoutPort = hostname.split(':')[0].replace(/[\[\]]/g, '');
     if (isIpAddress(hostWithoutPort)) {
         return hostWithoutPort;
     }
     
-    // 处理普通域名
+    // Process normal domain
     const parts = hostname.split('.');
     
-    // 如果只有两部分或更少，直接返回（不含端口号）
+    // If there are only two or fewer parts, return immediately (without port)
     if (parts.length <= 2) {
         return hostname.split(':')[0];
     }
     
-    // 返回最后两部分（不含端口号）
+    // Return last two parts (without port)
     return parts.slice(-2).join('.').split(':')[0];
 }
 
@@ -219,22 +219,22 @@ function isIpAddress(domain){
     return ipv4Regex.test(domain) || ipv6Regex.test(domain);
 }
 
-// 语音播报函数
+// Voice announcement function
 function speakDomain(domain) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance();
-        // 将域名拆分为单个字符并用逗号连接，保持 .com 等后缀完整
+        // Split domain into single characters and join with commas, keep suffixes like .com intact
         
         const parts = domain.split('.');
         const prefix = parts[0].split('').join(',');
         utterance.text = prefix + ',.' + parts[1];
 
-        // 如果是 IP 地址，每个数字或字符都单独读出
+        // If it's an IP address, read each number or character separately
         if (isIpAddress(domain)) {
             utterance.text = domain;
         }
         
-        // 根据当前语言设置语音
+        // Set voice based on current language
         utterance.lang = 'en-US';
         utterance.rate = 0.5;
         utterance.pitch = 1;
@@ -244,28 +244,28 @@ function speakDomain(domain) {
     }
 }
 
-// 添加域名高亮的函数
+// Function to highlight domain
 function highlightDomain(url) {
     try {
         const urlObj = new URL(url);
         const hostname = urlObj.hostname;
         const mainDomain = extractMainDomain(hostname);
         
-        // 构建正则表达式以精确匹配主域名
+        // Build regex to match main domain exactly
         const regex = new RegExp(`(${mainDomain.replace('.', '\\.')})`, 'g');
         
-        // 替换URL中的主域名为高亮版本，添加data-domain属性以便绑定点击事件
+        // Replace main domain in URL with highlighted version, add data-domain attribute for binding click event
         return url.replace(regex, `<span class="domain" data-domain="$1">$1</span>`);
     } catch (e) {
-        return url; // 如果URL解析失败，返回原始URL
+        return url; // If URL parsing fails, return original URL
     }
 }
 
-// 获取URL参数中的目标网址
+// Get target URL from URL parameters
 const urlParams = new URLSearchParams(window.location.search);
 const targetUrl = urlParams.get('url');
 
-// 初始化目标URL显示
+// Initialize target URL display
 async function initializeTargetUrl() {
     const targetUrl = urlParams.get('url');
     const targetUrlElement = document.getElementById('targetUrl');
@@ -274,12 +274,12 @@ async function initializeTargetUrl() {
     const container = document.querySelector('.container');
 
     if (targetUrl && targetUrlElement) {
-        // 有URL参数时显示URL相关内容
+        // Show URL related content when URL parameter exists
         urlSection.style.display = 'block';
         buttonGroup.style.display = 'flex';
         targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
         
-        // 检查域名是否在白名单中
+        // Check if domain is in whitelist
         try {
             const urlObj = new URL(decodeURIComponent(targetUrl));
             const domain = extractMainDomain(urlObj.hostname);
@@ -299,16 +299,16 @@ async function initializeTargetUrl() {
                 }
             };
         } catch (error) {
-            console.error('检查白名单失败:', error);
+            console.error('Failed to check whitelist:', error);
         }
-        
-        // 为域名添加点击事件
+
+        // Add click event for domain
         document.querySelectorAll('.domain').forEach(domainElement => {
             domainElement.addEventListener('click', () => {
                 const domain = domainElement.getAttribute('data-domain');
                 speakDomain(domain);
                 
-                // 添加点击动画效果
+                // Add click animation effect
                 domainElement.style.transform = 'scale(1.05)';
                 setTimeout(() => {
                     domainElement.style.transform = 'scale(1)';
@@ -316,7 +316,7 @@ async function initializeTargetUrl() {
             });
         });
     } else {
-        // 没有URL参数时显示介绍页
+        // Show introduction page when no URL parameter
         container.innerHTML = `
             <div class="intro-page">
                 <h1 class="intro-title" data-i18n="pageTitle">${i18n('pageTitle')}</h1>
@@ -337,30 +337,30 @@ async function initializeTargetUrl() {
 }
 
 let confirmCount = 0;
-let requiredClicks = 3; // 默认值
+let requiredClicks = 3; // Default value
 const confirmBtn = document.getElementById('confirmBtn');
 const visitBtn = document.getElementById('visitBtn');
 const confirmCountSpan = document.getElementById('confirmCount');
 const requiredClicksSpans = document.querySelector('.requiredClicks');
 
-// 获取所需的点击次数
+// Get required clicks
 chrome.runtime.sendMessage({ type: 'getRequiredClicks' }, (response) => {
     if (response && typeof response.clicks === 'number') {
         requiredClicks = response.clicks;
         
-        // 更新所有需要显示点击次数的元素
+        // Update all elements displaying click counts
         document.querySelectorAll('.requiredClicks').forEach(span => {
             if (span) {
                 span.textContent = requiredClicks.toString();
             }
         });
         
-        // 更新确认按钮文本
+        // Update confirm button text
         updateConfirmButtonText();
     }
 });
 
-// 更新确认按钮文本的函数
+// Function to update confirm button text
 function updateConfirmButtonText() {
     const confirmBtn = document.getElementById('confirmBtn');
     const visitBtn = document.getElementById('visitBtn');
@@ -387,7 +387,7 @@ function updateConfirmButtonText() {
     }
 }
 
-// 处理确认按钮点击
+// Handle confirm button click
 confirmBtn.addEventListener('click', () => {
     confirmCount++;
     updateConfirmButtonText();
@@ -398,99 +398,99 @@ confirmBtn.addEventListener('click', () => {
     }
 });
 
-// 处理访问按钮点击
+// Handle visit button click
 visitBtn.addEventListener('click', () => {
-    // 先发送消息给background，将URL添加到已确认列表
+    // First send message to background to add URL to confirmed list
     chrome.runtime.sendMessage({
         type: 'confirmUrl',
         url: decodeURIComponent(targetUrl)
     }, (response) => {
         if (response.success) {
-            // 确认成功后访问目标URL
+            // Visit target URL after confirmation
             window.location.href = decodeURIComponent(targetUrl);
         }
     });
 });
 
-// 初始化设置
+// Initialize settings
 function initializeSettings() {
     const clickNumber = document.getElementById('clickNumber');
     
-    // 从存储中获取设置
+    // Get settings from storage
     chrome.storage.local.get('requiredClicks', (result) => {
         // if (result.requiredClicks) {
             clickNumber.value = result.requiredClicks||0;
             requiredClicks = result.requiredClicks;
             
-            // 更新所有显示点击次数的元素
+            // Update all elements displaying click counts
             document.querySelectorAll('.requiredClicks').forEach(span => {
                 span.textContent = result.requiredClicks;
             });
             
-            // 更新确认按钮文本
+            // Update confirm button text
             updateConfirmButtonText();
         // }
     });
     
-    // 添加输入事件监听，实时更新
+    // Add input event listener to update in real time
     clickNumber.addEventListener('input', () => {
         let value = parseInt(clickNumber.value);
         
-        // 验证输入值
+        // Validate input value
         if (isNaN(value) || value < 0) value = 0;
         if (value > 9) value = 9;
         
-        // 更新输入框值
+        // Update input field value
         clickNumber.value = value;
         
-        // 更新设置
+        // Update settings
         requiredClicks = value;
         
-        // 更新所有显示点击次数的元素
+        // Update all elements displaying click counts
         document.querySelectorAll('.requiredClicks').forEach(span => {
             span.textContent = value;
         });
         
-        // 更新确认按钮文本
+        // Update confirm button text
         updateConfirmButtonText();
         
-        // 保存到存储
+        // Save to storage
         chrome.storage.local.set({ requiredClicks: value });
         
-        // 如果当前点击次数已经达到新的要求
+        // If current click count has reached new requirement
         
     });
 }
 
-// 处理白名单按钮点击
+// Handle whitelist button click
 document.getElementById('whitelistBtn').addEventListener('click', async () => {
     try {
         const urlObj = new URL(decodeURIComponent(targetUrl));
         const domain = extractMainDomain(urlObj.hostname);
         
-        // 打开数据库连接
+        // Open database connection
         const request = indexedDB.open('DomainWhitelist', 1);
         
-        request.onerror = () => console.error('无法打开数据库');
+        request.onerror = () => console.error('Failed to open database');
         
         request.onsuccess = (event) => {
             const db = event.target.result;
             const transaction = db.transaction(['domains'], 'readwrite');
             const store = transaction.objectStore('domains');
             
-            // 添加域名到白名单
+            // Add domain to whitelist
             const addRequest = store.add({
                 domain,
                 dateAdded: new Date().toISOString()
             });
             
             addRequest.onsuccess = () => {
-                // 更新按钮状态
+                // Update button status
                 const whitelistBtn = document.getElementById('whitelistBtn');
                 whitelistBtn.innerHTML = `<i class="ri-check-line"></i>${i18n('addedToWhitelist')}`;
                 whitelistBtn.style.color = 'var(--success-color)';
                 
-                // 更新白名单数量
+                // Update whitelist count
                 updateWhitelistCount();
 
                 confirmCount = requiredClicks;
@@ -499,7 +499,7 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
             
             addRequest.onerror = () => {
                 if (addRequest.error.name === 'ConstraintError') {
-                    // 域名已存在
+                    // Domain already exists
                     whitelistBtn.innerHTML = `<i class="ri-information-line"></i>${i18n('domainInWhitelist')}`;
                     whitelistBtn.style.color = 'var(--warning-color)';
 
@@ -517,23 +517,23 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
             }
         };
     } catch (error) {
-        console.error('添加到白名单失败:', error);
+        console.error('Failed to add to whitelist:', error);
     }
 });
 
-// 白名单列表相关功能
+// Whitelist list related functions
 const whitelistListBtn = document.getElementById('whitelistListBtn');
 const whitelistModal = document.getElementById('whitelistModal');
 const closeModalBtn = document.getElementById('closeModalBtn');
 const whitelistItems = document.getElementById('whitelistItems');
 const whitelistCount = document.getElementById('whitelistCount');
 
-// 分页相关变量
-const PAGE_SIZE = 10; // 每页显示的数量
+// Pagination related variables
+const PAGE_SIZE = 10; // Number of items to display per page
 let currentPage = 1;
 let totalPages = 1;
 
-// 更新白名单数量徽章
+// Update whitelist count badge
 async function updateWhitelistCount() {
     try {
         const db = await openDatabase();
@@ -546,12 +546,12 @@ async function updateWhitelistCount() {
         });
         whitelistCount.textContent = count;
     } catch (error) {
-        console.error('获取白名单数量失败:', error);
+        console.error('Failed to get whitelist count:', error);
         whitelistCount.textContent = '0';
     }
 }
 
-// 打开数据库的辅助函数
+// Helper function to open database
 function openDatabase() {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('DomainWhitelist', 1);
@@ -569,7 +569,7 @@ function openDatabase() {
     });
 }
 
-// 更新白名单列表项
+// Update whitelist list items
 async function updateWhitelistItems() {
     try {
         const db = await openDatabase();
@@ -587,16 +587,16 @@ async function updateWhitelistItems() {
                 return;
             }
 
-            // 按日期降序排序
+            // Sort by date descending
             domains.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
 
-            // 计算分页
+            // Calculate pagination
             totalPages = Math.ceil(domains.length / PAGE_SIZE);
             const start = (currentPage - 1) * PAGE_SIZE;
             const end = Math.min(start + PAGE_SIZE, domains.length);
             const pageItems = domains.slice(start, end);
 
-            // 显示当前页的数据
+            // Display data for current page
             pageItems.forEach(item => {
                 const domainElement = document.createElement('div');
                 domainElement.className = 'whitelist-item';
@@ -609,7 +609,7 @@ async function updateWhitelistItems() {
                 whitelistItems.appendChild(domainElement);
             });
 
-            // 绑定删除按钮事件
+            // Bind delete button event
             document.querySelectorAll('.remove-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const domain = e.currentTarget.dataset.domain;
@@ -617,23 +617,23 @@ async function updateWhitelistItems() {
                 });
             });
 
-            // 更新分页控件
+            // Update pagination controls
             updatePagination(domains.length);
         };
 
         request.onerror = () => {
-            console.error('获取白名单列表失败:', request.error);
+            console.error('Failed to get whitelist:', request.error);
             whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
             updatePagination(0);
         };
     } catch (error) {
-        console.error('访问数据库失败:', error);
+        console.error('Failed to access database:', error);
         whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('loadWhitelistFailed')}</div>`;
         updatePagination(0);
     }
 }
 
-// 更新分页控件
+// Update pagination controls
 function updatePagination(totalItems) {
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
@@ -642,15 +642,15 @@ function updatePagination(totalItems) {
 
     totalPages = Math.ceil(totalItems / PAGE_SIZE);
     
-    // 更新页码显示
+    // Update page number display
     currentPageSpan.textContent = currentPage;
     totalPagesSpan.textContent = totalPages;
 
-    // 更新按钮状态
+    // Update button status
     prevPageBtn.disabled = currentPage <= 1;
     nextPageBtn.disabled = currentPage >= totalPages;
 
-    // 更新分页信息文本
+    // Update pagination info text
     const pageInfo = document.querySelector('.page-info');
     if (pageInfo) {
         pageInfo.innerHTML = i18n('pageInfo', [
@@ -660,7 +660,7 @@ function updatePagination(totalItems) {
     }
 }
 
-// 从白名单中删除域名
+// Remove domain from whitelist
 async function removeFromWhitelist(domain) {
     try {
         const db = await openDatabase();
@@ -675,14 +675,14 @@ async function removeFromWhitelist(domain) {
         };
         
         request.onerror = () => {
-            console.error('删除域名失败:', request.error);
+            console.error('Failed to delete domain:', request.error);
         };
     } catch (error) {
-        console.error('访问数据库失败:', error);
+        console.error('Failed to access database:', error);
     }
 }
 
-// 导出白名单
+// Export whitelist
 async function exportWhitelist() {
     try {
         const db = await openDatabase();
@@ -694,14 +694,14 @@ async function exportWhitelist() {
             request.onerror = () => reject(request.error);
         });
 
-        // 创建导出数据
+        // Create export data
         const exportData = {
             version: '1.0',
             exportDate: new Date().toISOString(),
             domains: domains
         };
 
-        // 创建并下载文件
+        // Create and download file
         const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
@@ -712,11 +712,11 @@ async function exportWhitelist() {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
     } catch (error) {
-        console.error('导出白名单失败:', error);
+        console.error('Failed to export whitelist:', error);
     }
 }
 
-// 导入白名单
+// Import whitelist
 async function importWhitelist(file) {
     try {
         const content = await new Promise((resolve, reject) => {
@@ -728,16 +728,16 @@ async function importWhitelist(file) {
 
         const importData = JSON.parse(content);
         
-        // 验证导入数据格式
+        // Validate import data format
         if (!importData.domains || !Array.isArray(importData.domains)) {
-            throw new Error('无效的导入文件格式');
+            throw new Error('Invalid import file format');
         }
 
         const db = await openDatabase();
         const transaction = db.transaction(['domains'], 'readwrite');
         const store = transaction.objectStore('domains');
 
-        // 导入所有域名
+        // Import all domains
         for (const item of importData.domains) {
             if (item.domain && typeof item.domain === 'string') {
                 try {
@@ -747,62 +747,62 @@ async function importWhitelist(file) {
                         request.onerror = () => reject(request.error);
                     });
                 } catch (error) {
-                    console.warn(`导入域名 ${item.domain} 失败:`, error);
+                    console.warn(`Failed to import domain ${item.domain}:`, error);
                 }
             }
         }
 
-        // 更新界面
+        // Update interface
         updateWhitelistItems();
         updateWhitelistCount();
     } catch (error) {
-        console.error('导入白名单失败:', error);
+        console.error('Failed to import whitelist:', error);
     }
 }
 
-// 初始化白名单功能
+// Initialize whitelist functions
 function initializeWhitelist() {
     updateWhitelistCount();
     
-    // 绑定白名单列表按钮点击事件
+    // Bind whitelist list button click event
     whitelistListBtn.addEventListener('click', showWhitelistModal);
     
-    // 绑定关闭按钮点击事件
+    // Bind close button click event
     closeModalBtn.addEventListener('click', hideWhitelistModal);
     
-    // 点击模态框外部区域关闭
+    // Click outside modal area to close
     whitelistModal.addEventListener('click', (e) => {
         if (e.target === whitelistModal) {
             hideWhitelistModal();
         }
     });
 
-    // 绑定导入导出按钮事件
+    // Bind import export button events
     const importBtn = document.getElementById('importWhitelistBtn');
     const exportBtn = document.getElementById('exportWhitelistBtn');
     const fileInput = document.getElementById('whitelistFileInput');
 
     if (importBtn && exportBtn && fileInput) {
-        // 导入按钮点击事件
+        // Import button click event
         importBtn.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // 文件选择事件
+        // File selection event
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 importWhitelist(file);
-                // 清除文件选择，以便可以重复导入同一个文件
+                // Clear file selection, so same file can be imported multiple times
                 fileInput.value = '';
             }
         });
 
-        // 导出按钮点击事件
+        // Export button click event
         exportBtn.addEventListener('click', exportWhitelist);
     }
 
-    // 绑定分页按钮事件
+    // Bind pagination button events
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
 
@@ -821,29 +821,29 @@ function initializeWhitelist() {
     });
 }
 
-// 显示白名单列表
+// Show whitelist list
 function showWhitelistModal() {
     whitelistModal.classList.add('show');
-    currentPage = 1; // 重置页码
+    currentPage = 1; // Reset page number
     updateWhitelistItems();
 }
 
-// 隐藏白名单列表
+// Hide whitelist list
 function hideWhitelistModal() {
     whitelistModal.classList.remove('show');
 }
 
-// 在页面加载完成后初始化所有功能
+// Initialize all functions after page load
 document.addEventListener('DOMContentLoaded', () => {
-    // 初始化国际化
+    // Initialize internationalization
     initializeI18n();
     
-    // 初始化设置
+    // Initialize settings
     initializeSettings();
     
-    // 初始化白名单功能
+    // Initialize whitelist functions
     initializeWhitelist();
     
-    // 初始化目标URL显示
+    // Initialize target URL display
     initializeTargetUrl();
 }); 
