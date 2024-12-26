@@ -92,5 +92,5 @@ If you find this project helpful, please consider giving it a star on GitHub!
 ---
 
 <div align="center">
-Made with ❤️ by [@ezshine](https://x.com/intent/follow?screen_name=ezshine)
+Made with ❤️ by <a href='https://x.com/intent/follow?screen_name=ezshine'>@ezshine</a>
 </div>
