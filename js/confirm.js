@@ -195,14 +195,28 @@ function extractMainDomain(hostname) {
     // 移除最后的点（如果有）
     hostname = hostname.replace(/\.$/, '');
     
-    // 分割主机名
+    // 检查是否是 IP 地址
+    const hostWithoutPort = hostname.split(':')[0].replace(/[\[\]]/g, '');
+    if (isIpAddress(hostWithoutPort)) {
+        return hostWithoutPort;
+    }
+    
+    // 处理普通域名
     const parts = hostname.split('.');
     
-    // 如果只有两部分或更少，直接返回
-    if (parts.length <= 2) return hostname;
+    // 如果只有两部分或更少，直接返回（不含端口号）
+    if (parts.length <= 2) {
+        return hostname.split(':')[0];
+    }
     
-    // 返回最后两部分
-    return parts.slice(-2).join('.');
+    // 返回最后两部分（不含端口号）
+    return parts.slice(-2).join('.').split(':')[0];
+}
+
+function isIpAddress(domain){
+    const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    const ipv6Regex = /^([0-9a-fA-F:]+)$/;
+    return ipv4Regex.test(domain) || ipv6Regex.test(domain);
 }
 
 // 语音播报函数
@@ -210,13 +224,19 @@ function speakDomain(domain) {
     if ('speechSynthesis' in window) {
         const utterance = new SpeechSynthesisUtterance();
         // 将域名拆分为单个字符并用逗号连接，保持 .com 等后缀完整
+        
         const parts = domain.split('.');
         const prefix = parts[0].split('').join(',');
         utterance.text = prefix + ',.' + parts[1];
+
+        // 如果是 IP 地址，每个数字或字符都单独读出
+        if (isIpAddress(domain)) {
+            utterance.text = domain;
+        }
         
         // 根据当前语言设置语音
         utterance.lang = 'en-US';
-        utterance.rate = 0.8;
+        utterance.rate = 0.5;
         utterance.pitch = 1;
         utterance.volume = 1;
 
@@ -224,7 +244,7 @@ function speakDomain(domain) {
     }
 }
 
-// 添加域名高��的函数
+// 添加域名高亮的函数
 function highlightDomain(url) {
     try {
         const urlObj = new URL(url);
@@ -470,7 +490,7 @@ document.getElementById('whitelistBtn').addEventListener('click', async () => {
                 whitelistBtn.innerHTML = `<i class="ri-check-line"></i>${i18n('addedToWhitelist')}`;
                 whitelistBtn.style.color = 'var(--success-color)';
                 
-                // 更新白��单数量
+                // 更新白名单数量
                 updateWhitelistCount();
 
                 confirmCount = requiredClicks;
