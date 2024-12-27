@@ -23,6 +23,11 @@ A Chrome extension that helps users browse the web more safely by adding confirm
 - 🌐 Works on all websites
 - 🎨 Clean and intuitive user interface
 
+## 💻 Screenshots
+
+![Screenshot 1: Confirmation Dialog](screenshot01.png)
+![Screenshot 2: Settings Panel](screenshot02.png)
+
 ## 📦 Installation
 
 ### From Chrome Web Store (Recommended)

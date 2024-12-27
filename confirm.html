@@ -120,6 +120,32 @@
     .badge.animate-back {
       transform: scale(1);
     }
+
+    /* 版权信息样式 */
+    .copyright {
+      position: fixed;
+      left: 16px;
+      bottom: 16px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .copyright .separator {
+      color: #ddd;
+    }
+
+    .copyright a {
+      color: #666;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .copyright a:hover {
+      color: #1890ff;
+    }
   </style>
 </head>
 <body>
@@ -168,6 +194,13 @@
       <i class="ri-translate"></i>
       <span class="current-lang">中文</span>
     </button>
+  </div>
+
+  <!-- 版权信息 -->
+  <div class="copyright">
+    <span><i class="ri-github-fill"></i> <a target="_blank" href="https://github.com/ezshine/CarefullyOpenURL">CarefullyOpenURL</a></span>
+    <span class="separator">·</span>
+    <span>Made with ❤️ by <a href="https://x.com/intent/follow?screen_name=ezshine" target="_blank">ezshine</a></span>
   </div>
 
   <!-- 白名单列表弹层 -->
