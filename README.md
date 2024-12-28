@@ -4,11 +4,11 @@
 
 ![CarefullyOpenURL Logo](assets/logo128.png)
 
-A Chrome extension that helps users browse the web more safely by adding confirmation steps before opening any links.
+A Chrome extension that helps users browse the web more safely by adding confirmation steps before open any URLs.
 
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chrome.google.com/webstore)
-[![Version](https://img.shields.io/badge/version-1.0.0-brightgreen.svg)](https://github.com/yourusername/CarefulOpenLink/releases)
+[![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-green.svg)](https://chromewebstore.google.com/detail/fehlepigmdlihclchflgabggapbdcapa?authuser=2&hl=en)
+[![Version](https://img.shields.io/badge/version-1.0.1-brightgreen.svg)](https://github.com/ezshine/CarefullyOpenURL/releases)
 
 [Features](#features) • [Installation](#installation) • [Usage](#usage) • [Contributing](#contributing) • [License](#license)
 
@@ -31,7 +31,7 @@ A Chrome extension that helps users browse the web more safely by adding confirm
 ## 📦 Installation
 
 ### From Chrome Web Store (Recommended)
-1. Visit the [Chrome Web Store](https://chrome.google.com/webstore) (Coming soon)
+1. Visit the [Chrome Web Store](https://chromewebstore.google.com/detail/fehlepigmdlihclchflgabggapbdcapa?authuser=2&hl=en)
 2. Click "Add to Chrome"
 3. Follow the prompts to complete installation
 
