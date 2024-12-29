@@ -107,6 +107,29 @@ chrome.webNavigation.onBeforeNavigate.addListener(async (details) => {
     }
 });
 
+// Handle downloads from external apps
+chrome.downloads.onCreated.addListener(async (downloadItem) => {
+    // Check if URL is already confirmed
+    if (confirmedUrls.includes(downloadItem.url)) {
+        return;
+    }
+    
+    // Check whitelist
+    const isWhitelisted = await isDomainInWhitelist(downloadItem.url);
+    if (isWhitelisted) {
+        return;
+    }
+    
+    // Cancel the download immediately
+    chrome.downloads.cancel(downloadItem.id);
+    
+    // Open confirm page
+    chrome.tabs.create({
+        url: chrome.runtime.getURL('confirm.html') + '?url=' + encodeURIComponent(downloadItem.url)
+    });
+});
+
+
 // Add message listener, used to receive confirmation messages from confirm page
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.type === 'confirmUrl') {
