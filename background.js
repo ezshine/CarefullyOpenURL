@@ -1,23 +1,10 @@
+import { extractMainDomain } from './js/utils.js';
+
 // Store confirmed URLs
 let confirmedUrls = [];
 
 // Default click count
 const DEFAULT_REQUIRED_CLICKS = 3;
-
-// Extract main domain from URL
-function extractMainDomain(hostname) {
-    // Remove trailing dot (if exists)
-    hostname = hostname.replace(/\.$/, '');
-    
-    // Split hostname
-    const parts = hostname.split('.');
-    
-    // If only two parts or less, return directly
-    if (parts.length <= 2) return hostname;
-    
-    // Return last two parts
-    return parts.slice(-2).join('.');
-}
 
 // Check if domain is in whitelist
 async function isDomainInWhitelist(url) {

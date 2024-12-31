@@ -1,3 +1,5 @@
+import { extractMainDomain } from './utils.js';
+
 // Language package definition
 const messages = {
     'zh-CN': {
@@ -204,29 +206,6 @@ function initializeI18n() {
     if (langSwitch) {
         langSwitch.addEventListener('click', switchLanguage);
     }
-}
-
-// Function to extract main domain
-function extractMainDomain(hostname) {
-    // Remove trailing dot (if exists)
-    hostname = hostname.replace(/\.$/, '');
-    
-    // Check if it's an IP address
-    const hostWithoutPort = hostname.split(':')[0].replace(/[\[\]]/g, '');
-    if (isIpAddress(hostWithoutPort)) {
-        return hostWithoutPort;
-    }
-    
-    // Process normal domain
-    const parts = hostname.split('.');
-    
-    // If there are only two or fewer parts, return immediately (without port)
-    if (parts.length <= 2) {
-        return hostname.split(':')[0];
-    }
-    
-    // Return last two parts (without port)
-    return parts.slice(-2).join('.').split(':')[0];
 }
 
 function isIpAddress(domain){
