@@ -34,7 +34,10 @@ const messages = {
         'searchPlaceholder': '搜索域名...',
         'clearAll': '清空全部',
         'introPoint1': '1. 防范钓鱼网站最好的方式就是仔细检查每一个即将要打开的网址。',
-        'introPoint2': '2. 钓鱼网站通常采用近似目标域名的方式来进行迷惑，点击播放域名的读音，将使得这些迷惑的域名无处遁形。'
+        'introPoint2': '2. 钓鱼网站通常采用近似目标域名的方式来进行迷惑，点击播放域名的读音，将使得这些迷惑的域名无处遁形。',
+        'loadingWhois': '正在获取域名信息...',
+        'registrationDate': '注册时间',
+        'expiryDate': '到期时间'
     },
     'en': {
         'pageTitle': 'Carefully Open URL',
@@ -68,7 +71,10 @@ const messages = {
         'searchPlaceholder': 'Search domains...',
         'clearAll': 'Clear All',
         'introPoint1': '1. The best way to prevent phishing is to carefully check every url before opening it.',
-        'introPoint2': '2. Phishing sites often use similar domain names to deceive. Click to play the domain pronunciation to expose these deceptive domains.'
+        'introPoint2': '2. Phishing sites often use similar domain names to deceive. Click to play the domain pronunciation to expose these deceptive domains.',
+        'loadingWhois': 'Loading domain information...',
+        'registrationDate': 'Registration Date',
+        'expiryDate': 'Expiry Date'
     }
 };
 
@@ -273,6 +279,38 @@ async function initializeTargetUrl() {
         urlSection.style.display = 'block';
         buttonGroup.style.display = 'flex';
         targetUrlElement.innerHTML = highlightDomain(decodeURIComponent(targetUrl));
+        
+        // 获取并显示域名注册时间
+        try {
+            const urlObj = new URL(decodeURIComponent(targetUrl));
+            const domain = extractMainDomain(urlObj.hostname);
+            
+            // 创建一个显示注册时间的元素
+            const registrationInfo = document.createElement('div');
+            registrationInfo.className = 'registration-info';
+            registrationInfo.innerHTML = `<i class="ri-time-line"></i> ${i18n('loadingWhois')}`;
+            targetUrlElement.insertAdjacentElement('afterend', registrationInfo);
+            
+            // 获取 whois 信息
+            chrome.runtime.sendMessage({
+                type: 'getWhoisInfo',
+                domain: domain
+            }, response => {
+                if (response.success) {
+                    registrationInfo.innerHTML = `
+                        <div class="whois-info">
+                            <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
+                            <div><i class="ri-time-line"></i> ${i18n('registrationDate')}: ${response.info.registrationDate}</div>
+                            <div><i class="ri-calendar-event-line"></i> ${i18n('expiryDate')}: ${response.info.expiryDate}</div>
+                        </div>
+                    `;
+                } else {
+                    registrationInfo.innerHTML = `<i class="ri-error-warning-line"></i> ${response.error}`;
+                }
+            });
+        } catch (error) {
+            console.error('获取域名信息失败:', error);
+        }
         
         // Check if domain is in whitelist
         try {

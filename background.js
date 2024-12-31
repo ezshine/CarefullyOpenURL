@@ -142,5 +142,58 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
             sendResponse({clicks: clicks});
         });
         return true; // Indicates asynchronous response
+    } else if (message.type === 'getWhoisInfo') {
+        fetchWhoisInfo(message.domain).then(info => {
+            sendResponse({success: true, info});
+        }).catch(error => {
+            sendResponse({success: false, error: error.message});
+        });
+        return true; // 异步响应
     }
-}); 
+});
+
+// 获取域名的 whois 信息
+async function fetchWhoisInfo(domain) {
+    try {
+        const response = await fetch(`https://www.whois.com/whois/${domain}`);
+        const html = await response.text();
+        
+        // 使用正则表达式提取注册时间和到期时间
+        const creationDateMatch = html.match(/Creation Date:\s*([^\n<]+)/i) || 
+                                html.match(/Registered On:\s*([^\n<]+)/i) ||
+                                html.match(/Registration Date:\s*([^\n<]+)/i);
+        
+        const expiryDateMatch = html.match(/Registry Expiry Date:\s*([^\n<]+)/i) ||
+                               html.match(/Expires On:\s*([^\n<]+)/i) ||
+                               html.match(/Expiration Date:\s*([^\n<]+)/i);
+
+        // 格式化时间的函数
+        const formatDate = (dateStr) => {
+            try {
+                const date = new Date(dateStr);
+                return new Intl.DateTimeFormat('zh-CN', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).format(date);
+            } catch (e) {
+                return dateStr; // 如果转换失败，返回原始字符串
+            }
+        };
+        
+        if (creationDateMatch || expiryDateMatch) {
+            return {
+                registrationDate: creationDateMatch ? formatDate(creationDateMatch[1].trim()) : '未知',
+                expiryDate: expiryDateMatch ? formatDate(expiryDateMatch[1].trim()) : '未知'
+            };
+        } else {
+            throw new Error('无法获取域名注册信息');
+        }
+    } catch (error) {
+        console.error('Whois 查询失败:', error);
+        throw new Error('Whois 查询失败');
+    }
+} 

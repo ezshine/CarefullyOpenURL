@@ -567,4 +567,44 @@ h1 {
 .page-buttons {
   display: flex;
   gap: 8px;
+}
+
+.registration-info {
+    margin-top: 10px;
+    padding: 8px 12px;
+    background-color: var(--bg-secondary);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.registration-info i {
+    font-size: 16px;
+}
+
+.whois-info {
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 24px;
+    width: 100%;
+}
+
+.whois-info div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+}
+
+.whois-info i {
+    font-size: 16px;
+    color: var(--primary-color);
+} 
+
+.whois-info a {
+  text-decoration: unset;
 } 
