@@ -21,6 +21,15 @@ function extractMainDomain(hostname) {
 
 // Check if domain is in whitelist
 async function isDomainInWhitelist(url) {
+
+    // 不拦截 chrome 内部链接和 blob
+    if (url.startsWith('chrome://') || 
+        url.startsWith('chrome-extension://') || 
+        url.startsWith('about:') ||
+        url.startsWith('blob:')) {
+        return true;
+    }
+
     try {
         const urlObj = new URL(url);
         const domain = extractMainDomain(urlObj.hostname);
@@ -117,6 +126,11 @@ chrome.downloads.onCreated.addListener(async (downloadItem) => {
     // Check whitelist
     const isWhitelisted = await isDomainInWhitelist(downloadItem.url);
     if (isWhitelisted) {
+        return;
+    }
+
+    // 只拦截刚创建的下载
+    if (downloadItem.state !== 'in_progress') {
         return;
     }
     
