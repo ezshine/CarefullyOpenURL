@@ -305,7 +305,12 @@ async function initializeTargetUrl() {
                         </div>
                     `;
                 } else {
-                    registrationInfo.innerHTML = `<i class="ri-error-warning-line"></i> ${response.error}`;
+                    registrationInfo.innerHTML = `
+                        <div class="whois-info">
+                            <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
+                            <div><i class="ri-error-warning-line"></i> ${response.error}</div>
+                        </div>
+                    `;
                 }
             });
         } catch (error) {
