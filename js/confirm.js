@@ -359,25 +359,9 @@ const visitBtn = document.getElementById('visitBtn');
 const confirmCountSpan = document.getElementById('confirmCount');
 const requiredClicksSpans = document.querySelector('.requiredClicks');
 
-// Get required clicks
-chrome.runtime.sendMessage({ type: 'getRequiredClicks' }, (response) => {
-    if (response && typeof response.clicks === 'number') {
-        requiredClicks = response.clicks;
-        
-        // Update all elements displaying click counts
-        document.querySelectorAll('.requiredClicks').forEach(span => {
-            if (span) {
-                span.textContent = requiredClicks.toString();
-            }
-        });
-        
-        // Update confirm button text
-        updateConfirmButtonText();
-    }
-});
-
 // Function to update confirm button text
 function updateConfirmButtonText() {
+    // debugger;
     const confirmBtn = document.getElementById('confirmBtn');
     const visitBtn = document.getElementById('visitBtn');
     
@@ -442,7 +426,6 @@ function initializeSettings() {
             document.querySelectorAll('.requiredClicks').forEach(span => {
                 span.textContent = result.requiredClicks;
             });
-            
             // Update confirm button text
             updateConfirmButtonText();
         // }
