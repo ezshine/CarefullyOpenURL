@@ -226,21 +226,32 @@
         </div>
       </div>
       <div class="modal-body">
+        <!-- 搜索框 -->
+        <div class="search-box">
+          <i class="ri-search-line"></i>
+          <input type="text" id="whitelistSearch" data-i18n-placeholder="searchPlaceholder">
+        </div>
         <!-- 白名单列表容器 -->
         <div class="whitelist-items" id="whitelistItems">
           <!-- 白名单列表项将通过 JavaScript 动态添加 -->
         </div>
         <!-- 分页控件 -->
         <div class="pagination">
-          <button class="page-btn" id="prevPage" disabled>
-            <i class="ri-arrow-left-s-line"></i>
+          <button class="action-btn danger-btn" id="clearWhitelistBtn" title="清空白名单">
+            <i class="ri-delete-bin-line"></i>
+            <span data-i18n="clearAll">清空全部</span>
           </button>
           <span class="page-info">
             第 <span id="currentPage">1</span> 页，共 <span id="totalPages">1</span> 页
           </span>
-          <button class="page-btn" id="nextPage" disabled>
-            <i class="ri-arrow-right-s-line"></i>
-          </button>
+          <div class="page-buttons">
+            <button class="page-btn" id="prevPage" disabled>
+              <i class="ri-arrow-left-s-line"></i>
+            </button>
+            <button class="page-btn" id="nextPage" disabled>
+              <i class="ri-arrow-right-s-line"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>

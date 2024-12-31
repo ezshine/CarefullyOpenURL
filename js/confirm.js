@@ -25,7 +25,12 @@ const messages = {
         'invalidImportFormat': '无效的导入文件格式',
         'pageInfo': '第 $1 页，共 $2 页',
         'addedToWhitelist': '已加入白名单',
-        'domainInWhitelist': '域名已��白名单中',
+        'domainInWhitelist': '域名已在白名单中',
+        'clearWhitelistConfirm': '确定要清空所有白名单数据吗？此操作不可恢复。',
+        'clearWhitelistSuccess': '白名单已清空',
+        'clearWhitelistFailed': '清空白名单失败',
+        'searchPlaceholder': '搜索域名...',
+        'clearAll': '清空全部',
         'introPoint1': '1. 防范钓鱼网站最好的方式就是仔细检查每一个即将要打开的网址。',
         'introPoint2': '2. 钓鱼网站通常采用近似目标域名的方式来进行迷惑，点击播放域名的读音，将使得这些迷惑的域名无处遁形。'
     },
@@ -55,6 +60,11 @@ const messages = {
         'pageInfo': 'Page $1 of $2',
         'addedToWhitelist': 'Added to whitelist',
         'domainInWhitelist': 'Domain already in whitelist',
+        'clearWhitelistConfirm': 'Are you sure you want to clear all whitelist data? This operation cannot be undone.',
+        'clearWhitelistSuccess': 'Whitelist has been cleared',
+        'clearWhitelistFailed': 'Failed to clear whitelist',
+        'searchPlaceholder': 'Search domains...',
+        'clearAll': 'Clear All',
         'introPoint1': '1. The best way to prevent phishing is to carefully check every url before opening it.',
         'introPoint2': '2. Phishing sites often use similar domain names to deceive. Click to play the domain pronunciation to expose these deceptive domains.'
     }
@@ -118,6 +128,12 @@ function updateAllText() {
         } else {
             element.textContent = i18n(messageName);
         }
+    });
+
+    // Update elements with data-i18n-placeholder attribute
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
+        const messageName = element.getAttribute('data-i18n-placeholder');
+        element.placeholder = i18n(messageName);
     });
 
     // Update page title
@@ -760,63 +776,188 @@ async function importWhitelist(file) {
     }
 }
 
-// Initialize whitelist functions
+// 添加搜索和清空功能
+let searchTimeout;
+let currentSearchTerm = '';
+
+// 搜索白名单
+async function searchWhitelist(searchTerm) {
+    try {
+        const db = await openDatabase();
+        const transaction = db.transaction(['domains'], 'readonly');
+        const store = transaction.objectStore('domains');
+        const domains = await new Promise((resolve, reject) => {
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = () => reject(request.error);
+        });
+
+        // 过滤域名
+        const filteredDomains = domains.filter(item => 
+            item.domain.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        // 更新分页和显示
+        currentPage = 1;
+        updateWhitelistDisplay(filteredDomains);
+    } catch (error) {
+        console.error('搜索白名单失败:', error);
+    }
+}
+
+// 更新白名单显示
+function updateWhitelistDisplay(domains) {
+    whitelistItems.innerHTML = '';
+
+    if (domains.length === 0) {
+        whitelistItems.innerHTML = `<div class="whitelist-item">${i18n('noWhitelistData')}</div>`;
+        updatePagination(0);
+        return;
+    }
+
+    // 计算分页
+    totalPages = Math.ceil(domains.length / PAGE_SIZE);
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const end = Math.min(start + PAGE_SIZE, domains.length);
+    const pageItems = domains.slice(start, end);
+
+    // 显示当前页数据
+    pageItems.forEach(item => {
+        const domainElement = document.createElement('div');
+        domainElement.className = 'whitelist-item';
+        domainElement.innerHTML = `
+            <span class="domain">${item.domain}</span>
+            <button class="remove-btn" data-domain="${item.domain}">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        `;
+        whitelistItems.appendChild(domainElement);
+    });
+
+    // 绑定删除按钮事件
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const domain = e.currentTarget.dataset.domain;
+            removeFromWhitelist(domain);
+        });
+    });
+
+    // 更新分页控件
+    updatePagination(domains.length);
+}
+
+// 清空白名单
+async function clearWhitelist() {
+    if (!confirm(i18n('clearWhitelistConfirm'))) {
+        return;
+    }
+
+    try {
+        const db = await openDatabase();
+        const transaction = db.transaction(['domains'], 'readwrite');
+        const store = transaction.objectStore('domains');
+        
+        await new Promise((resolve, reject) => {
+            const request = store.clear();
+            request.onsuccess = () => resolve();
+            request.onerror = () => reject(request.error);
+        });
+
+        // 更新界面
+        updateWhitelistItems();
+        updateWhitelistCount();
+        alert(i18n('clearWhitelistSuccess'));
+    } catch (error) {
+        console.error('清空白名单失败:', error);
+        alert(i18n('clearWhitelistFailed'));
+    }
+}
+
+// 修改初始化白名单函数
 function initializeWhitelist() {
     updateWhitelistCount();
     
-    // Bind whitelist list button click event
+    // 绑定白名单列表按钮点击事件
     whitelistListBtn.addEventListener('click', showWhitelistModal);
     
-    // Bind close button click event
+    // 绑定关闭按钮点击事件
     closeModalBtn.addEventListener('click', hideWhitelistModal);
     
-    // Click outside modal area to close
+    // 点击模态框外部区域关闭
     whitelistModal.addEventListener('click', (e) => {
         if (e.target === whitelistModal) {
             hideWhitelistModal();
         }
     });
 
-    // Bind import export button events
+    // 绑定导入导出按钮事件
     const importBtn = document.getElementById('importWhitelistBtn');
     const exportBtn = document.getElementById('exportWhitelistBtn');
+    const clearBtn = document.getElementById('clearWhitelistBtn');
     const fileInput = document.getElementById('whitelistFileInput');
+    const searchInput = document.getElementById('whitelistSearch');
 
-    if (importBtn && exportBtn && fileInput) {
-        // Import button click event
+    if (importBtn && exportBtn && fileInput && clearBtn && searchInput) {
+        // 导入按钮点击事件
         importBtn.addEventListener('click', () => {
             fileInput.click();
         });
 
-        // File selection event
+        // 文件选择事件
         fileInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
                 importWhitelist(file);
-                // Clear file selection, so same file can be imported multiple times
                 fileInput.value = '';
             }
         });
 
-        // Export button click event
+        // 导出按钮点击事件
         exportBtn.addEventListener('click', exportWhitelist);
+
+        // 清空按钮点击事件
+        clearBtn.addEventListener('click', clearWhitelist);
+
+        // 搜索输入事件
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            currentSearchTerm = searchTerm;
+            
+            // 清除之前的定时器
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // 设置新的定时器
+            searchTimeout = setTimeout(() => {
+                searchWhitelist(searchTerm);
+            }, 300);
+        });
     }
 
-    // Bind pagination button events
+    // 绑定分页按钮事件
     const prevPageBtn = document.getElementById('prevPage');
     const nextPageBtn = document.getElementById('nextPage');
 
     prevPageBtn.addEventListener('click', () => {
         if (currentPage > 1) {
             currentPage--;
-            updateWhitelistItems();
+            if (currentSearchTerm) {
+                searchWhitelist(currentSearchTerm);
+            } else {
+                updateWhitelistItems();
+            }
         }
     });
 
     nextPageBtn.addEventListener('click', () => {
         if (currentPage < totalPages) {
             currentPage++;
-            updateWhitelistItems();
+            if (currentSearchTerm) {
+                searchWhitelist(currentSearchTerm);
+            } else {
+                updateWhitelistItems();
+            }
         }
     });
 }
