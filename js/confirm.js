@@ -1,4 +1,4 @@
-import { extractMainDomain } from './utils.js';
+import { extractMainDomain, isIpAddress } from './utils.js';
 
 // Language package definition
 const messages = {
@@ -214,12 +214,6 @@ function initializeI18n() {
     }
 }
 
-function isIpAddress(domain){
-    const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
-    const ipv6Regex = /^([0-9a-fA-F:]+)$/;
-    return ipv4Regex.test(domain) || ipv6Regex.test(domain);
-}
-
 // Voice announcement function
 function speakDomain(domain) {
     if ('speechSynthesis' in window) {
@@ -250,6 +244,7 @@ function highlightDomain(url) {
     try {
         const urlObj = new URL(url);
         const hostname = urlObj.hostname;
+
         const mainDomain = extractMainDomain(hostname);
         
         // Build regex to match main domain exactly
@@ -283,36 +278,38 @@ async function initializeTargetUrl() {
         // 获取并显示域名注册时间
         try {
             const urlObj = new URL(decodeURIComponent(targetUrl));
-            const domain = extractMainDomain(urlObj.hostname);
-            
-            // 创建一个显示注册时间的元素
-            const registrationInfo = document.createElement('div');
-            registrationInfo.className = 'registration-info';
-            registrationInfo.innerHTML = `<i class="ri-time-line"></i> ${i18n('loadingWhois')}`;
-            targetUrlElement.insertAdjacentElement('afterend', registrationInfo);
-            
-            // 获取 whois 信息
-            chrome.runtime.sendMessage({
-                type: 'getWhoisInfo',
-                domain: domain
-            }, response => {
-                if (response.success) {
-                    registrationInfo.innerHTML = `
-                        <div class="whois-info">
-                            <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
-                            <div><i class="ri-time-line"></i> ${i18n('registrationDate')}: ${response.info.registrationDate}</div>
-                            <div><i class="ri-calendar-event-line"></i> ${i18n('expiryDate')}: ${response.info.expiryDate}</div>
-                        </div>
-                    `;
-                } else {
-                    registrationInfo.innerHTML = `
-                        <div class="whois-info">
-                            <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
-                            <div><i class="ri-error-warning-line"></i> ${response.error}</div>
-                        </div>
-                    `;
-                }
-            });
+            if(!isIpAddress(urlObj.hostname)){
+                const domain = extractMainDomain(urlObj.hostname);
+                
+                // 创建一个显示注册时间的元素
+                const registrationInfo = document.createElement('div');
+                registrationInfo.className = 'registration-info';
+                registrationInfo.innerHTML = `<i class="ri-time-line"></i> ${i18n('loadingWhois')}`;
+                targetUrlElement.insertAdjacentElement('afterend', registrationInfo);
+                
+                // 获取 whois 信息
+                chrome.runtime.sendMessage({
+                    type: 'getWhoisInfo',
+                    domain: domain
+                }, response => {
+                    if (response.success) {
+                        registrationInfo.innerHTML = `
+                            <div class="whois-info">
+                                <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
+                                <div><i class="ri-time-line"></i> ${i18n('registrationDate')}: ${response.info.registrationDate}</div>
+                                <div><i class="ri-calendar-event-line"></i> ${i18n('expiryDate')}: ${response.info.expiryDate}</div>
+                            </div>
+                        `;
+                    } else {
+                        registrationInfo.innerHTML = `
+                            <div class="whois-info">
+                                <div><a href='https://www.whois.com/whois/${domain}' target='blank'><i class="ri-external-link-line"></i> Whois info</a></div>
+                                <div><i class="ri-error-warning-line"></i> ${response.error}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
         } catch (error) {
             console.error('获取域名信息失败:', error);
         }

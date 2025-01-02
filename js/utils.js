@@ -1,7 +1,17 @@
+export function isIpAddress(domain){
+    const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    const ipv6Regex = /^([0-9a-fA-F:]+)$/;
+    return ipv4Regex.test(domain) || ipv6Regex.test(domain);
+}
+
 // Extract main domain from URL
 export function extractMainDomain(hostname) {
     // Remove trailing dot (if exists)
     hostname = hostname.replace(/\.$/, '');
+
+    if(isIpAddress(hostname)){
+        return hostname;
+    }
     
     // Split hostname and handle multi-level TLDs
     const parts = hostname.split('.');
